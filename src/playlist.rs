@@ -22,7 +22,8 @@ impl<'a> Playlist<'a> {
     /// Gets the current tracklist from Pandora.
     pub fn list(&self) -> Result<Vec<Track>> {
         let tracklist = self.pandora.request::<Tracklist>(Method::StationGetPlaylist, Some(serde_json::to_value(TracklistRequest {
-                station_token: self.station_token.clone()
+                station_token: self.station_token.clone(),
+                additional_audio_url: String::from("HTTP_128_MP3")
             }).unwrap())
         )?;
         Ok(tracklist.items)
@@ -67,6 +68,8 @@ pub struct Track {
 
     #[serde(rename="audioUrlMap")]
     pub track_audio: Option<TrackAudio>,
+    #[serde(rename="additionalAudioUrl")]
+    pub additional_audio_url: Option<String>,
 
     #[serde(rename="adToken")]
     pub ad_token: Option<String>,
@@ -125,6 +128,8 @@ pub struct Audio {
 struct TracklistRequest {
     #[serde(rename="stationToken")]
     station_token: String,
+    #[serde(rename="additionalAudioUrl")]
+    additional_audio_url: String,
 }
 
 #[derive(Serialize)]

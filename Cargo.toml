@@ -1,9 +1,9 @@
 [package]
 name = "pandora-rs2"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Connor Perkins <cperkin4@gmu.edu>"]
 edition = "2018"
-description = "Updated version of pandora-rs"
+description = "Updated version of pandora"
 license = "MIT"
 
 [dependencies]
