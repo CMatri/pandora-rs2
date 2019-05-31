@@ -133,7 +133,7 @@ struct TracklistRequest {
 }
 
 #[derive(Serialize)]
-struct RateTrackRequest {
+pub struct RateTrackRequest {
     #[serde(rename="stationToken")]
     station_token: String,
     #[serde(rename="trackToken")]
