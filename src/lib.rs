@@ -55,7 +55,7 @@ impl Pandora {
         Stations::new(self)
     }
 
-    fn request<T>(&self, method: Method, body: Option<Value>) -> Result<T> where T: DeserializeOwned {
+    pub fn request<T>(&self, method: Method, body: Option<Value>) -> Result<T> where T: DeserializeOwned {
         let credentials = self.credentials.lock().unwrap();
         let req = request(&self.client, self.endpoint, method.clone(), body.clone(), Some(&credentials.borrow()));
 
@@ -68,7 +68,7 @@ impl Pandora {
         }
     }
 
-    fn request_noop(&self, method: Method, body: Option<Value>) -> Result<()> {
+    pub fn request_noop(&self, method: Method, body: Option<Value>) -> Result<()> {
         let credentials = self.credentials.lock().unwrap();
 
         let req = request::<()>(&self.client, self.endpoint, method.clone(), body.clone(), Some(&credentials.borrow()));
