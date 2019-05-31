@@ -17,6 +17,11 @@ version = "0.1.5"
 authors = ["Connor Perkins <cperkin4@gmu.edu>"]
 description = "Updated version of pandora"
 license = "MIT"
+homepage = "https://github.com/CMatri/pandora-rs2"
+repository = "https://github.com/CMatri/pandora-rs2"
+readme = "./README.md"
+documentation = "https://docs.rs/pandora-rs2/"
+
 [dependencies.reqwest]
 version = "0.9.15"
 

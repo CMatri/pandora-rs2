@@ -1,8 +1,8 @@
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Stat {
-    #[serde(rename="ok")]
+    #[serde(rename = "ok")]
     Ok,
-    #[serde(rename="fail")]
+    #[serde(rename = "fail")]
     Fail,
 }
 
