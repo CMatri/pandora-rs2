@@ -41,7 +41,6 @@ impl Credentials {
         let user_login_body = serde_json::to_value(&UserLoginRequest::new(username.to_owned(), password.to_owned())).expect("Fatal error creating user login body");
         let user_login: UserLogin = request(&client, DEFAULT_ENDPOINT, Method::AuthUserLogin, Some(user_login_body), Some(&credentials)).expect("Fatal error requesting user creds");
         credentials.set_user_login(user_login);
-        println!("User auth token: {}", credentials.user_auth_token().unwrap());
 
         Ok(credentials)
     }
