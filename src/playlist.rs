@@ -135,9 +135,9 @@ struct TracklistRequest {
 #[derive(Serialize)]
 pub struct RateTrackRequest {
     #[serde(rename="stationToken")]
-    station_token: String,
+    pub station_token: String,
     #[serde(rename="trackToken")]
-    track_token: String,
+    pub track_token: String,
     #[serde(rename="isPositive")]
-    is_positive: bool,
+    pub is_positive: bool,
 }

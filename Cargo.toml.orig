@@ -1,6 +1,6 @@
 [package]
 name = "pandora-rs2"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Connor Perkins <cperkin4@gmu.edu>"]
 edition = "2018"
 description = "Updated version of pandora"
