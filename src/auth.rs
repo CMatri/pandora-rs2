@@ -1,10 +1,10 @@
+use super::crypt::decrypt;
+use super::error::Result;
+use super::method::Method;
+use super::request::request;
 use super::DEFAULT_ENDPOINT;
 use reqwest::Client;
 use serde_json;
-use super::crypt::decrypt;
-use super::method::Method;
-use super::request::request;
-use super::error::Result;
 
 #[derive(Debug)]
 pub struct Credentials {
@@ -35,13 +35,29 @@ impl Credentials {
             user_auth_token: None,
         };
 
-        let partner_login: PartnerLogin = request(&client, DEFAULT_ENDPOINT, Method::AuthPartnerLogin, Some(serde_json::to_value(&partner)?), None)?;
+        let partner_login: PartnerLogin = request(
+            &client,
+            DEFAULT_ENDPOINT,
+            Method::AuthPartnerLogin,
+            Some(serde_json::to_value(&partner)?),
+            None,
+        )?;
         credentials.set_partner_login(partner_login);
 
-        let user_login_body = serde_json::to_value(&UserLoginRequest::new(username.to_owned(), password.to_owned())).expect("Fatal error creating user login body");
-        let user_login: UserLogin = request(&client, DEFAULT_ENDPOINT, Method::AuthUserLogin, Some(user_login_body), Some(&credentials)).expect("Fatal error requesting user creds");
+        let user_login_body = serde_json::to_value(&UserLoginRequest::new(
+            username.to_owned(),
+            password.to_owned(),
+        ))
+        .expect("Fatal error creating user login body");
+        let user_login: UserLogin = request(
+            &client,
+            DEFAULT_ENDPOINT,
+            Method::AuthUserLogin,
+            Some(user_login_body),
+            Some(&credentials),
+        )
+        .expect("Fatal error requesting user creds");
         credentials.set_user_login(user_login);
-        println!("User auth token: {}", credentials.user_auth_token().unwrap());
 
         Ok(credentials)
     }
@@ -108,8 +124,8 @@ impl Credentials {
     }
 
     fn set_partner_login(&mut self, partner_login: PartnerLogin) {
-        use std::str;
         use std::os::unix::ffi::OsStrExt;
+        use std::str;
 
         let sync_time_bytes: Vec<u8> = decrypt(self.decrypt_key(), &partner_login.sync_time)
             .as_os_str()
@@ -136,12 +152,12 @@ impl Credentials {
 pub struct Partner {
     username: String,
     password: String,
-    #[serde(rename="deviceModel")]
+    #[serde(rename = "deviceModel")]
     device_model: String,
     version: String,
-    #[serde(rename="encryptPassword")]
+    #[serde(rename = "encryptPassword")]
     encrypt_password: String,
-    #[serde(rename="decryptPassword")]
+    #[serde(rename = "decryptPassword")]
     decrypt_password: String,
 }
 
@@ -159,13 +175,14 @@ impl Default for Partner {
 }
 
 impl Partner {
-    pub fn new(username: String,
-               password: String,
-               device_model: String,
-               version: String,
-               encrypt_password: String,
-               decrypt_password: String)
-               -> Self {
+    pub fn new(
+        username: String,
+        password: String,
+        device_model: String,
+        version: String,
+        encrypt_password: String,
+        decrypt_password: String,
+    ) -> Self {
         Partner {
             username: username,
             password: password,
@@ -179,31 +196,31 @@ impl Partner {
 
 #[derive(Debug, Deserialize)]
 pub struct CheckLicensing {
-    #[serde(rename="isAllowed")]
-    pub is_allowed: bool
+    #[serde(rename = "isAllowed")]
+    pub is_allowed: bool,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct PartnerLogin {
-    #[serde(rename="partnerId")]
+    #[serde(rename = "partnerId")]
     pub partner_id: String,
-    #[serde(rename="partnerAuthToken")]
+    #[serde(rename = "partnerAuthToken")]
     pub partner_auth_token: String,
-    #[serde(rename="syncTime")]
+    #[serde(rename = "syncTime")]
     pub sync_time: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct UserLogin {
-    #[serde(rename="userId")]
+    #[serde(rename = "userId")]
     pub user_id: Option<String>,
-    #[serde(rename="userAuthToken")]
+    #[serde(rename = "userAuthToken")]
     pub user_auth_token: String,
 }
 
 #[derive(Serialize)]
 struct UserLoginRequest {
-    #[serde(rename="loginType")]
+    #[serde(rename = "loginType")]
     login_type: String,
     username: String,
     password: String,

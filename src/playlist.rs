@@ -1,7 +1,7 @@
-use super::Pandora;
 use super::error::Result;
 use super::method::Method;
 use super::stations::ToStationToken;
+use super::Pandora;
 
 use serde_json;
 
@@ -12,7 +12,10 @@ pub struct Playlist<'a> {
 }
 
 impl<'a> Playlist<'a> {
-    pub fn new<T>(pandora: &'a Pandora, station: &T) -> Playlist<'a> where T: ToStationToken {
+    pub fn new<T>(pandora: &'a Pandora, station: &T) -> Playlist<'a>
+    where
+        T: ToStationToken,
+    {
         Playlist {
             pandora: pandora,
             station_token: station.to_station_token(),
@@ -21,22 +24,36 @@ impl<'a> Playlist<'a> {
 
     /// Gets the current tracklist from Pandora.
     pub fn list(&self) -> Result<Vec<Track>> {
-        let tracklist = self.pandora.request::<Tracklist>(Method::StationGetPlaylist, Some(serde_json::to_value(TracklistRequest {
-                station_token: self.station_token.clone(),
-                additional_audio_url: String::from("HTTP_128_MP3")
-            }).unwrap())
+        let tracklist = self.pandora.request::<Tracklist>(
+            Method::StationGetPlaylist,
+            Some(
+                serde_json::to_value(TracklistRequest {
+                    station_token: self.station_token.clone(),
+                    additional_audio_url: String::from("HTTP_128_MP3"),
+                })
+                .unwrap(),
+            ),
         )?;
         Ok(tracklist.items)
     }
 
     // TODO: Result should not be empty
     /// Rates a track.
-    pub fn rate<T>(&self, track: T, is_positive: bool) -> Result<()> where T: ToTrackToken {
-        self.pandora.request_noop(Method::StationAddFeedback, Some(serde_json::to_value(RateTrackRequest {
-                                                                                            station_token: self.station_token.clone(),
-                                                                                            track_token: track.to_track_token().unwrap_or("".to_owned()),
-                                                                                            is_positive: is_positive,
-                                                                                        }).unwrap()))
+    pub fn rate<T>(&self, track: T, is_positive: bool) -> Result<()>
+    where
+        T: ToTrackToken,
+    {
+        self.pandora.request_noop(
+            Method::StationAddFeedback,
+            Some(
+                serde_json::to_value(RateTrackRequest {
+                    station_token: self.station_token.clone(),
+                    track_token: track.to_track_token().unwrap_or("".to_owned()),
+                    is_positive: is_positive,
+                })
+                .unwrap(),
+            ),
+        )
     }
 }
 
@@ -55,23 +72,23 @@ struct Tracklist {
 /// the tracklist can include ads.
 #[derive(Debug, Clone, Deserialize)]
 pub struct Track {
-    #[serde(rename="trackToken")]
+    #[serde(rename = "trackToken")]
     pub track_token: Option<String>,
-    #[serde(rename="artistName")]
+    #[serde(rename = "artistName")]
     pub artist_name: Option<String>,
-    #[serde(rename="albumName")]
+    #[serde(rename = "albumName")]
     pub album_name: Option<String>,
-    #[serde(rename="songName")]
+    #[serde(rename = "songName")]
     pub song_name: Option<String>,
-    #[serde(rename="songRating")]
+    #[serde(rename = "songRating")]
     pub song_rating: Option<u32>,
 
-    #[serde(rename="audioUrlMap")]
+    #[serde(rename = "audioUrlMap")]
     pub track_audio: Option<TrackAudio>,
-    #[serde(rename="additionalAudioUrl")]
+    #[serde(rename = "additionalAudioUrl")]
     pub additional_audio_url: Option<String>,
 
-    #[serde(rename="adToken")]
+    #[serde(rename = "adToken")]
     pub ad_token: Option<String>,
 }
 
@@ -102,11 +119,11 @@ impl<'a> ToTrackToken for &'a Track {
 /// Struct for deserializing audio types for a track.
 #[derive(Debug, Clone, Deserialize)]
 pub struct TrackAudio {
-    #[serde(rename="lowQuality")]
+    #[serde(rename = "lowQuality")]
     pub low_quality: Audio,
-    #[serde(rename="mediumQuality")]
+    #[serde(rename = "mediumQuality")]
     pub medium_quality: Audio,
-    #[serde(rename="highQuality")]
+    #[serde(rename = "highQuality")]
     pub high_quality: Audio,
 }
 
@@ -115,7 +132,7 @@ pub struct TrackAudio {
 pub struct Audio {
     pub bitrate: String,
     pub encoding: String,
-    #[serde(rename="audioUrl")]
+    #[serde(rename = "audioUrl")]
     pub audio_url: String,
     pub protocol: String,
 }
@@ -126,18 +143,18 @@ pub struct Audio {
 
 #[derive(Serialize)]
 struct TracklistRequest {
-    #[serde(rename="stationToken")]
+    #[serde(rename = "stationToken")]
     station_token: String,
-    #[serde(rename="additionalAudioUrl")]
+    #[serde(rename = "additionalAudioUrl")]
     additional_audio_url: String,
 }
 
 #[derive(Serialize)]
-struct RateTrackRequest {
-    #[serde(rename="stationToken")]
-    station_token: String,
-    #[serde(rename="trackToken")]
-    track_token: String,
-    #[serde(rename="isPositive")]
-    is_positive: bool,
+pub struct RateTrackRequest {
+    #[serde(rename = "stationToken")]
+    pub station_token: String,
+    #[serde(rename = "trackToken")]
+    pub track_token: String,
+    #[serde(rename = "isPositive")]
+    pub is_positive: bool,
 }

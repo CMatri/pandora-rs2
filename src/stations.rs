@@ -1,8 +1,8 @@
-use super::Pandora;
 use super::error::Result;
 use super::method::Method;
-use super::music::{ToMusicToken, MusicType};
+use super::music::{MusicType, ToMusicToken};
 use super::playlist::Playlist;
+use super::Pandora;
 
 use serde_json;
 
@@ -16,57 +16,115 @@ impl<'a> Stations<'a> {
     }
 
     pub fn list(&self) -> Result<Vec<Station>> {
-        let stations = self.pandora.request::<StationList>(Method::UserGetStationList, None)?;
+        let stations = self
+            .pandora
+            .request::<StationList>(Method::UserGetStationList, None)?;
         Ok(stations.stations)
     }
 
-    pub fn create<T>(&self, music_token: &T) -> Result<Station> where T: ToMusicToken {
-        self.pandora.request(Method::StationCreateStation, Some(serde_json::to_value(CreateStationRequest {
-                                                                                    track_token: None,
-                                                                                    music_type: None,
-                                                                                    music_token: Some(music_token.to_music_token()),
-                                                                                }).unwrap()))
+    pub fn create<T>(&self, music_token: &T) -> Result<Station>
+    where
+        T: ToMusicToken,
+    {
+        self.pandora.request(
+            Method::StationCreateStation,
+            Some(
+                serde_json::to_value(CreateStationRequest {
+                    track_token: None,
+                    music_type: None,
+                    music_token: Some(music_token.to_music_token()),
+                })
+                .unwrap(),
+            ),
+        )
     }
 
-    pub fn rename<T>(&self, station: &T, station_name: &str) -> Result<Station> where T: ToStationToken {
-        self.pandora.request(Method::StationRenameStation, Some(serde_json::to_value(RenameStationRequest {
-                                                                                    station_token: station.to_station_token(),
-                                                                                    station_name: station_name.to_owned(),
-                                                                                }).unwrap()))
+    pub fn rename<T>(&self, station: &T, station_name: &str) -> Result<Station>
+    where
+        T: ToStationToken,
+    {
+        self.pandora.request(
+            Method::StationRenameStation,
+            Some(
+                serde_json::to_value(RenameStationRequest {
+                    station_token: station.to_station_token(),
+                    station_name: station_name.to_owned(),
+                })
+                .unwrap(),
+            ),
+        )
     }
 
-    pub fn delete<T>(&self, station: &T) -> Result<()> where T: ToStationToken {
-        self.pandora.request_noop(Method::StationDeleteStation, Some(serde_json::to_value(DeleteStationRequest {
-                                                                                    station_token: station.to_station_token(),
-                                                                                }).unwrap()))
+    pub fn delete<T>(&self, station: &T) -> Result<()>
+    where
+        T: ToStationToken,
+    {
+        self.pandora.request_noop(
+            Method::StationDeleteStation,
+            Some(
+                serde_json::to_value(DeleteStationRequest {
+                    station_token: station.to_station_token(),
+                })
+                .unwrap(),
+            ),
+        )
     }
 
-    pub fn add_seed<S, T>(&self, station: &S, music_token: &T) -> Result<Seed> where S: ToStationToken, T: ToMusicToken {
-        self.pandora.request(Method::StationAddMusic, Some(serde_json::to_value(AddSeedRequest {
-                                                                                    station_token: station.to_station_token(),
-                                                                                    music_token: music_token.to_music_token(),
-                                                                                }).unwrap()))
+    pub fn add_seed<S, T>(&self, station: &S, music_token: &T) -> Result<Seed>
+    where
+        S: ToStationToken,
+        T: ToMusicToken,
+    {
+        self.pandora.request(
+            Method::StationAddMusic,
+            Some(
+                serde_json::to_value(AddSeedRequest {
+                    station_token: station.to_station_token(),
+                    music_token: music_token.to_music_token(),
+                })
+                .unwrap(),
+            ),
+        )
     }
 
     pub fn remove_seed(&self, seed: &Seed) -> Result<()> {
-        self.pandora.request(Method::StationDeleteMusic, Some(serde_json::to_value(RemoveSeedRequest { 
-                                                                                    seed_id: seed.seed_id.clone() 
-                                                                                }).unwrap()))
+        self.pandora.request(
+            Method::StationDeleteMusic,
+            Some(
+                serde_json::to_value(RemoveSeedRequest {
+                    seed_id: seed.seed_id.clone(),
+                })
+                .unwrap(),
+            ),
+        )
     }
 
-    pub fn station<T>(&self, station: &T) -> Result<Station> where T: ToStationToken {
-        self.pandora.request(Method::StationGetStation, Some(serde_json::to_value(GetStationRequest {
-                                                                                    station_token: station.to_station_token(),
-                                                                                    include_extended_attributes: true,
-                                                                                }).unwrap()))
+    pub fn station<T>(&self, station: &T) -> Result<Station>
+    where
+        T: ToStationToken,
+    {
+        self.pandora.request(
+            Method::StationGetStation,
+            Some(
+                serde_json::to_value(GetStationRequest {
+                    station_token: station.to_station_token(),
+                    include_extended_attributes: true,
+                })
+                .unwrap(),
+            ),
+        )
     }
 
     // Gets the current checksum of the station; useful if you need to check for changes.
     pub fn checksum(&self) -> Result<StationListChecksum> {
-        self.pandora.request(Method::UserGetStationListChecksum, None)
+        self.pandora
+            .request(Method::UserGetStationListChecksum, None)
     }
 
-    pub fn playlist<T>(&self, station: &T) -> Playlist where T: ToStationToken {
+    pub fn playlist<T>(&self, station: &T) -> Playlist
+    where
+        T: ToStationToken,
+    {
         Playlist::new(self.pandora, station)
     }
 }
@@ -77,9 +135,9 @@ pub trait ToStationToken {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Station {
-    #[serde(rename="stationId")]
+    #[serde(rename = "stationId")]
     pub station_id: String,
-    #[serde(rename="stationName")]
+    #[serde(rename = "stationName")]
     pub station_name: String,
 }
 
@@ -102,11 +160,11 @@ pub struct StationListChecksum {
 
 #[derive(Debug, Deserialize)]
 pub struct ExtendedStation {
-    #[serde(rename="stationId")]
+    #[serde(rename = "stationId")]
     pub station_id: String,
-    #[serde(rename="stationName")]
+    #[serde(rename = "stationName")]
     pub station_name: String,
-    #[serde(rename="artUrl")]
+    #[serde(rename = "artUrl")]
     pub art_url: Option<String>,
     // Some stations don't allow adding music (e.g. QuickMix).
     pub music: Option<StationMusic>,
@@ -123,46 +181,46 @@ pub struct StationMusic {
 /// Generic seed.
 #[derive(Debug, Deserialize)]
 pub struct Seed {
-    #[serde(rename="seedId")]
+    #[serde(rename = "seedId")]
     pub seed_id: String,
 }
 
 /// Song seed.
 #[derive(Debug, Deserialize)]
 pub struct SongSeed {
-    #[serde(rename="seedId")]
+    #[serde(rename = "seedId")]
     pub seed_id: String,
-    #[serde(rename="artistName")]
+    #[serde(rename = "artistName")]
     pub artist_name: String,
-    #[serde(rename="artUrl")]
+    #[serde(rename = "artUrl")]
     pub art_url: String,
-    #[serde(rename="songName")]
+    #[serde(rename = "songName")]
     pub song_name: String,
-    #[serde(rename="musicToken")]
+    #[serde(rename = "musicToken")]
     pub music_token: String,
 }
 
 /// Artist seed.
 #[derive(Debug, Deserialize)]
 pub struct ArtistSeed {
-    #[serde(rename="seedId")]
+    #[serde(rename = "seedId")]
     pub seed_id: String,
-    #[serde(rename="artistName")]
+    #[serde(rename = "artistName")]
     pub artist_name: String,
-    #[serde(rename="artUrl")]
+    #[serde(rename = "artUrl")]
     pub art_url: String,
-    #[serde(rename="musicToken")]
+    #[serde(rename = "musicToken")]
     pub music_token: String,
 }
 
 /// Genre seed.
 #[derive(Debug, Deserialize)]
 pub struct GenreSeed {
-    #[serde(rename="seedId")]
+    #[serde(rename = "seedId")]
     pub seed_id: String,
-    #[serde(rename="artistName")]
+    #[serde(rename = "artistName")]
     pub genre_name: String,
-    #[serde(rename="musicToken")]
+    #[serde(rename = "musicToken")]
     pub music_token: String,
 }
 
@@ -172,46 +230,46 @@ pub struct GenreSeed {
 
 #[derive(Serialize)]
 struct CreateStationRequest {
-    #[serde(rename="trackToken")]
+    #[serde(rename = "trackToken")]
     track_token: Option<String>,
-    #[serde(rename="musicType")]
+    #[serde(rename = "musicType")]
     music_type: Option<MusicType>,
-    #[serde(rename="musicToken")]
+    #[serde(rename = "musicToken")]
     music_token: Option<String>,
 }
 
 #[derive(Serialize)]
 struct RenameStationRequest {
-    #[serde(rename="stationToken")]
+    #[serde(rename = "stationToken")]
     station_token: String,
-    #[serde(rename="stationName")]
+    #[serde(rename = "stationName")]
     station_name: String,
 }
 
 #[derive(Serialize)]
 struct DeleteStationRequest {
-    #[serde(rename="stationToken")]
+    #[serde(rename = "stationToken")]
     station_token: String,
 }
 
 #[derive(Serialize)]
 struct GetStationRequest {
-    #[serde(rename="stationToken")]
+    #[serde(rename = "stationToken")]
     station_token: String,
-    #[serde(rename="includeExtendedAttributes")]
+    #[serde(rename = "includeExtendedAttributes")]
     include_extended_attributes: bool,
 }
 
 #[derive(Serialize)]
 struct AddSeedRequest {
-    #[serde(rename="stationToken")]
+    #[serde(rename = "stationToken")]
     station_token: String,
-    #[serde(rename="musicToken")]
+    #[serde(rename = "musicToken")]
     music_token: String,
 }
 
 #[derive(Serialize)]
 struct RemoveSeedRequest {
-    #[serde(rename="seedId")]
+    #[serde(rename = "seedId")]
     seed_id: String,
 }

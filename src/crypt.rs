@@ -3,7 +3,7 @@
 use std::ffi::OsString;
 
 use crypto::blowfish::Blowfish;
-use crypto::symmetriccipher::{BlockEncryptor, BlockDecryptor};
+use crypto::symmetriccipher::{BlockDecryptor, BlockEncryptor};
 
 const PADDING_BYTE: u8 = 2;
 
@@ -13,9 +13,13 @@ const PADDING_BYTE: u8 = 2;
 /// which is a UTF-8 string, so it's fine to return it using
 /// the `String` type.
 pub fn encrypt(key: &str, input: &str) -> String {
-    let cipherbytes = cipher_with(key.as_bytes(),
-                                  input.as_bytes(),
-                                  |blowfish, from, mut to| { blowfish.encrypt_block(from, to); });
+    let cipherbytes = cipher_with(
+        key.as_bytes(),
+        input.as_bytes(),
+        |blowfish, from, mut to| {
+            blowfish.encrypt_block(from, to);
+        },
+    );
 
     // Generate hexadecimal representation of `cipherbytes`.
     let mut output = String::with_capacity(cipherbytes.len() * 2);
@@ -31,10 +35,10 @@ pub fn encrypt(key: &str, input: &str) -> String {
 /// doesn't guarantees an UTF-8 string, we return
 /// a OsString which doesn't have to be UTF-8 compilant.
 pub fn decrypt(key: &str, hex_input: &str) -> OsString {
-    use std::u8;
-    use std::str;
     use std::ffi::OsStr;
     use std::os::unix::ffi::OsStrExt;
+    use std::str;
+    use std::u8;
 
     // Gets bytes from hexadecimal representation.
     let mut input = Vec::with_capacity(hex_input.len());
@@ -59,9 +63,9 @@ pub fn decrypt(key: &str, hex_input: &str) -> OsString {
 
 /// Divides the input in blocks and ciphers it using the given closure.
 fn cipher_with<F>(key: &[u8], input: &[u8], func: F) -> Vec<u8>
-    where F: Fn(&Blowfish, &[u8], &mut [u8])
+where
+    F: Fn(&Blowfish, &[u8], &mut [u8]),
 {
-
     let blowfish = Blowfish::new(key);
     let block_size = <Blowfish as BlockEncryptor>::block_size(&blowfish);
 
@@ -96,7 +100,7 @@ fn round_len(len: usize, block_size: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::{encrypt, decrypt};
+    use super::{decrypt, encrypt};
     use std::ffi::OsString;
 
     struct Test {
@@ -107,10 +111,10 @@ mod tests {
 
     fn get_test_vector() -> Vec<Test> {
         vec![Test {
-                 key: "R=U!LH$O2B#".to_owned(),
-                 plain_text: "è.<Ú1477631903".to_owned(),
-                 cipher_text: "4a6b45612b018614c92c50dc73462bbd".to_owned(),
-             }]
+            key: "R=U!LH$O2B#".to_owned(),
+            plain_text: "è.<Ú1477631903".to_owned(),
+            cipher_text: "4a6b45612b018614c92c50dc73462bbd".to_owned(),
+        }]
     }
 
     #[test]

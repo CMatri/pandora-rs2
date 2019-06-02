@@ -1,8 +1,8 @@
 //! Traits and structs for Songs, Artists, and Searches.
 
-use super::Pandora;
 use super::error::Result;
 use super::method::Method;
+use super::Pandora;
 
 use serde_json;
 
@@ -19,20 +19,20 @@ impl ToMusicToken for String {
 
 #[derive(Serialize, Deserialize)]
 pub enum MusicType {
-    #[serde(rename="song")]
+    #[serde(rename = "song")]
     Song,
-    #[serde(rename="artist")]
+    #[serde(rename = "artist")]
     Artist,
 }
 
 /// Song information.
 #[derive(Debug, Deserialize)]
 pub struct Song {
-    #[serde(rename="artistName")]
+    #[serde(rename = "artistName")]
     pub artist_name: String,
-    #[serde(rename="musicToken")]
+    #[serde(rename = "musicToken")]
     pub music_token: String,
-    #[serde(rename="songName")]
+    #[serde(rename = "songName")]
     pub song_name: String,
     pub score: u32,
 }
@@ -46,11 +46,11 @@ impl ToMusicToken for Song {
 /// Artist information.
 #[derive(Debug, Deserialize)]
 pub struct Artist {
-    #[serde(rename="artistName")]
+    #[serde(rename = "artistName")]
     pub artist_name: String,
-    #[serde(rename="musicToken")]
+    #[serde(rename = "musicToken")]
     pub music_token: String,
-    #[serde(rename="likelyMatch")]
+    #[serde(rename = "likelyMatch")]
     pub likely_match: bool,
     pub score: u32,
 }
@@ -64,9 +64,9 @@ impl ToMusicToken for Artist {
 /// Private struct for sending a search request.
 #[derive(Serialize)]
 struct Search {
-    #[serde(rename="searchText")]
+    #[serde(rename = "searchText")]
     search_text: String,
-    #[serde(rename="includeNearMatches")]
+    #[serde(rename = "includeNearMatches")]
     include_near_matches: bool,
 }
 
@@ -74,7 +74,7 @@ struct Search {
 /// the search string.
 #[derive(Debug, Deserialize)]
 pub struct SearchResults {
-    #[serde(rename="nearMatchesAvailable")]
+    #[serde(rename = "nearMatchesAvailable")]
     near_matches_available: bool,
     songs: Vec<Song>,
     artists: Vec<Artist>,
@@ -114,9 +114,15 @@ impl<'a> Music<'a> {
 
     /// Searches for music using the given search string.
     pub fn search(&self, search_text: &str) -> Result<SearchResults> {
-        self.pandora.request(Method::MusicSearch, Some(serde_json::to_value(Search {
-                                                search_text: search_text.to_owned(),
-                                                include_near_matches: true,
-                                            }).unwrap()))
+        self.pandora.request(
+            Method::MusicSearch,
+            Some(
+                serde_json::to_value(Search {
+                    search_text: search_text.to_owned(),
+                    include_near_matches: true,
+                })
+                .unwrap(),
+            ),
+        )
     }
 }

@@ -1,4 +1,4 @@
-#[derive(Clone)] 
+#[derive(Clone)]
 pub enum Method {
     TestCheckLicensing,
 
@@ -19,7 +19,7 @@ pub enum Method {
     StationDeleteMusic,
 
     StationGetPlaylist,
-    StationAddFeedback
+    StationAddFeedback,
 }
 
 impl ToString for Method {
@@ -53,7 +53,7 @@ impl Method {
     pub fn is_encrypted(&self) -> bool {
         match *self {
             Method::TestCheckLicensing | Method::AuthPartnerLogin => false,
-            _ => true
+            _ => true,
         }
     }
 }
