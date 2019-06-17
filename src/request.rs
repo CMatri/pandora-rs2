@@ -1,6 +1,6 @@
 use serde::de::DeserializeOwned;
 use serde_json;
-use serde_json::value::{Number, Value};
+use serde_json::value::Value;
 
 use url::Url;
 

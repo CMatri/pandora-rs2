@@ -124,17 +124,15 @@ impl Credentials {
     }
 
     fn set_partner_login(&mut self, partner_login: PartnerLogin) {
-        use std::os::unix::ffi::OsStrExt;
         use std::str;
 
         let sync_time_bytes: Vec<u8> = decrypt(self.decrypt_key(), &partner_login.sync_time)
-            .as_os_str()
-            .as_bytes()
             .iter()
             .skip(4)
             .cloned()
             .collect();
         let sync_time_str = str::from_utf8(&sync_time_bytes).unwrap_or("0");
+
         let sync_time = sync_time_str.parse::<u64>().unwrap_or(0);
 
         self.partner_id = Some(partner_login.partner_id.clone());

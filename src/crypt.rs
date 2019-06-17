@@ -34,9 +34,7 @@ pub fn encrypt(key: &str, input: &str) -> String {
 /// Because Strings must be UTF-8 compilant, and decrypting
 /// doesn't guarantees an UTF-8 string, we return
 /// a OsString which doesn't have to be UTF-8 compilant.
-pub fn decrypt(key: &str, hex_input: &str) -> OsString {
-    use std::ffi::OsStr;
-    use std::os::unix::ffi::OsStrExt;
+pub fn decrypt(key: &str, hex_input: &str) -> Vec<u8> {
     use std::str;
     use std::u8;
 
@@ -58,7 +56,7 @@ pub fn decrypt(key: &str, hex_input: &str) -> OsString {
         cipherbytes.truncate(index);
     }
 
-    OsStr::from_bytes(&cipherbytes).to_owned()
+    cipherbytes
 }
 
 /// Divides the input in blocks and ciphers it using the given closure.
